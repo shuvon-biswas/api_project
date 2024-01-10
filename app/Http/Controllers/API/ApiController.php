@@ -52,14 +52,17 @@ class ApiController extends Controller
             throw new Exception('JSON decoding error: ' . json_last_error_msg());
         }
 
-        // Dump the API response for debugging
-        //dd($responseData);
+        // Paginate the data
+        $perPage = 20;
+        $currentPage = request()->input('page', 1);
+        $path = url('/admin/api-project'); // Set the correct base path
+        $pagedData = array_slice($responseData, ($currentPage - 1) * $perPage, $perPage);
+        $responseData = new \Illuminate\Pagination\LengthAwarePaginator($pagedData, count($responseData), $perPage, $currentPage, [
+            'path' => $path,
+        ]);
         $data = [
             'responseData' => $responseData,
         ];
         return view('show', $data);
-
-        // Uncomment the following line to return the view with the data
-        // return view('show', compact('responseData'));
     }
 }
