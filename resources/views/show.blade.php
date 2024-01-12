@@ -45,7 +45,7 @@
                 <!-- Table Rows -->
                 @foreach($responseData as $index => $data)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
+                    <td>{{ ($responseData->currentPage() - 1) * $responseData->perPage() + $index + 1 }}</td>
                     <td>{{ $data->API }}</td>
                     <td>{{ $data->Description }}</td>
                     <td>{{ $data->Auth }}</td>
