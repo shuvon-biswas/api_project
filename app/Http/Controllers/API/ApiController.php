@@ -6,10 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ApiController extends Controller
 {
-    public function apiTest()
+    public function fatchDataApi()
     {
         $curl = curl_init();
         $url = 'https://api.publicapis.org/entries';
@@ -52,17 +53,66 @@ class ApiController extends Controller
             throw new Exception('JSON decoding error: ' . json_last_error_msg());
         }
 
+        return $responseData;
+    }
+
+    public function apiTest(Request $request)
+    {
+        // Fetch API data
+        $responseData = $this->fatchDataApi();
+
         // Paginate the data
         $perPage = 20;
-        $currentPage = request()->input('page', 1);
+        $currentPage = $request->input('page', 1);
         $path = url('/admin/api-project'); // Set the correct base path
         $pagedData = array_slice($responseData, ($currentPage - 1) * $perPage, $perPage);
-        $responseData = new \Illuminate\Pagination\LengthAwarePaginator($pagedData, count($responseData), $perPage, $currentPage, [
+        $responseData = new LengthAwarePaginator($pagedData, count($responseData), $perPage, $currentPage, [
             'path' => $path,
+            'query' => $request->query(),
         ]);
+
         $data = [
             'responseData' => $responseData,
         ];
+
         return view('show', $data);
     }
+
+    public function searchApi(Request $request)
+    {
+        $search = $request->search;
+
+        $responseData = $this->fatchDataApi();
+
+        // Filter data based on search term
+        if (!empty($search)) {
+            $responseData = array_filter($responseData, function ($entry) use ($search) {
+                // Adjust the condition based on your search requirements
+                $categoryMatch = stripos($entry->Category, $search) !== false;
+                $apiMatch = stripos($entry->API, $search) !== false;
+                $corsMatch = stripos($entry->Cors, $search) !== false;
+
+                // Return true if either category or API matches the search term
+                return $categoryMatch || $apiMatch || $corsMatch;
+            });
+        }
+
+        // Paginate the data
+        $perPage = 20;
+        $currentPage = $request->input('page', 1);
+        $path = url('/admin/api-project'); // Set the correct base path
+        $pagedData = array_slice($responseData, ($currentPage - 1) * $perPage, $perPage);
+        $responseData = new LengthAwarePaginator($pagedData, count($responseData), $perPage, $currentPage, [
+            'path' => $path,
+            'query' => $request->query(),
+        ]);
+
+        $data = [
+            'responseData' => $responseData,
+        ];
+
+        return view('show', $data);
+    }
+
+
 }

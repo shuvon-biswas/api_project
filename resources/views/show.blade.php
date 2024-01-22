@@ -19,7 +19,8 @@
         <h1 class="text-center my-3">API TABLE</h1>
 
         <!-- Search Box -->
-        <form action="{{ url()->current() }}" method="GET" class="mb-4">
+        <form action="{{route('admin.search.api')}}" method="GET" class="mb-4">
+            @csrf
             <div class="input-group">
                 <input type="text" name="search" class="form-control" placeholder="Search..."
                     value="{{ request('search') }}">
@@ -106,32 +107,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Get the search input and table rows
-            const searchInput = document.querySelector('input[name="search"]');
-            const tableRows = document.querySelectorAll('.table tbody tr');
-
-            // Add an event listener to the search input
-            searchInput.addEventListener('input', function () {
-                const searchTerm = searchInput.value.trim().toLowerCase();
-
-                // Loop through each table row
-                tableRows.forEach(function (row) {
-                    const rowData = row.textContent.toLowerCase();
-
-                    // If the row contains the search term, display it; otherwise, hide it
-                    if (rowData.includes(searchTerm)) {
-                        row.style.display = 'table-row';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
 
 </body>
 

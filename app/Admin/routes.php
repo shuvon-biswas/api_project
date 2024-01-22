@@ -15,5 +15,6 @@ Route::group([
     $router->get('/', 'HomeController@index')->name('home');
 
     $router->get('api-project', [ApiController::class, 'apiTest']);
+    $router->get('search-api', [ApiController::class, 'searchApi'])->name('search.api');
 
 });
