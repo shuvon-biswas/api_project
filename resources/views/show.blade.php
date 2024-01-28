@@ -1,8 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,6 +9,9 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <!-- xlsx library for Excel file generation -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.16.9/dist/xlsx.full.min.js"></script>
 
     <title>Home</title>
 </head>
@@ -27,8 +29,10 @@
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
         </form>
+
         @if (!empty($responseData))
-        <table class="table table-bordered my-5">
+        <button id="exportButton" class="btn btn-success">Export Data (Excel)</button>
+        <table id="apiTable" class="table table-bordered my-5">
             <!-- Table Headers -->
             <thead>
                 <tr>
@@ -61,9 +65,8 @@
         <div class="d-flex justify-content-center my-4">
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
-
-                    <li class="page-item @if($responseData->currentPage() == 1) disabled @endif">
-                        <a class="page-link" href="{{ $responseData->previousPageUrl() }}" tabindex="-1"
+                    <li class="page-item {{ $responseData->currentPage() == 1 ? 'disabled' : '' }}">
+                        <a class="page-link" href="{{ $responseData->url(1) }}" tabindex="-1"
                             aria-disabled="true">Previous</a>
                     </li>
 
@@ -76,12 +79,12 @@
                     $endPage = min($totalPages, $currentPage + $halfMax);
 
                     if ($startPage > 1) {
-                    echo '<li class="page-item"><a class="page-link" href="#">...</a></li>';
+                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li>';
                     }
                     @endphp
 
                     @for ($i = $startPage; $i <= $endPage; $i++) <li
-                        class="page-item @if($responseData->currentPage() == $i) active @endif">
+                        class="page-item {{ $responseData->currentPage() == $i ? 'active' : '' }}">
                         <a class="page-link" href="{{ $responseData->url($i) }}">{{ $i }}</a>
                         </li>
                         @endfor
@@ -89,15 +92,12 @@
                         @if ($endPage < $totalPages) <li class="page-item"><a class="page-link" href="#">...</a></li>
                             @endif
 
-                            <li
-                                class="page-item @if($responseData->currentPage() == $responseData->lastPage()) disabled @endif">
-                                <a class="page-link" href="{{ $responseData->nextPageUrl() }}">Next</a>
+                            <li class="page-item {{ $responseData->currentPage() == $totalPages ? 'disabled' : '' }}">
+                                <a class="page-link" href="{{ $responseData->url($totalPages) }}">Next</a>
                             </li>
-
                 </ul>
             </nav>
         </div>
-
 
         @else
         <p>No data available.</p>
@@ -107,6 +107,23 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const exportButton = document.getElementById('exportButton');
+            const apiTable = document.getElementById('apiTable');
+
+            exportButton.addEventListener('click', function () {
+                // Convert table data to Excel file
+                const ws = XLSX.utils.table_to_sheet(apiTable);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+                // Save the Excel file
+                XLSX.writeFile(wb, 'api_data.xlsx');
+            });
+        });
+    </script>
 
 </body>
 
