@@ -5,12 +5,11 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Exception;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ApiController extends Controller
 {
-    public function fatchDataApi()
+    public function fetchDataApi()
     {
         $curl = curl_init();
         $url = 'https://api.publicapis.org/entries';
@@ -59,7 +58,7 @@ class ApiController extends Controller
     public function apiTest(Request $request)
     {
         // Fetch API data
-        $responseData = $this->fatchDataApi();
+        $responseData = $this->fetchDataApi();
 
         // Paginate the data
         $perPage = 20;
@@ -82,7 +81,7 @@ class ApiController extends Controller
     {
         $search = $request->search;
 
-        $responseData = $this->fatchDataApi();
+        $responseData = $this->fetchDataApi();
 
         // Filter data based on search term
         if (!empty($search)) {
@@ -114,5 +113,11 @@ class ApiController extends Controller
         return view('show', $data);
     }
 
+    public function getAllApi()
+    {
+        // Fetch all API data
+        $responseData = $this->fetchDataApi();
 
+        return response()->json($responseData);
+    }
 }

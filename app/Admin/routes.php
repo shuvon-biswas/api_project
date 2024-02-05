@@ -17,4 +17,8 @@ Route::group([
     $router->get('api-project', [ApiController::class, 'apiTest']);
     $router->get('search-api', [ApiController::class, 'searchApi'])->name('search.api');
 
+    // New route for exporting all API data
+    $router->get('all-api', [ApiController::class, 'getAllApi'])->name('all.api');
+
 });
+
